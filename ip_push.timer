@@ -1,0 +1,10 @@
+[Unit]
+Description=Periodic timer for IP-PUSH
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=3h
+Unit=ip_push.service
+
+[Install]
+WantedBy=multi-user.target

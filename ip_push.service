@@ -1,0 +1,9 @@
+[Unit]
+Description=Push IP Address to slack
+
+[Service]
+ExecStart=%h/IP-PUSH/ip_push.py
+
+[Install]
+WantedBy=multi-user.target
+
