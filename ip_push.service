@@ -2,8 +2,14 @@
 Description=Push IP Address to slack
 
 [Service]
-ExecStart=%h/IP-PUSH/ip_push.py
+KillMode=process
+ExecStart=%h/IP-PUSH/ip_push.py %h/IP-PUSH/slack_uri.txt
+Type=simple
+Restart=always
+RestartSec=10
+
+Environment=DISPLAY=:1
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 

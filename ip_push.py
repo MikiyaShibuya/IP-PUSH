@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 from datetime import datetime
-from slack_sdk.web import WebClient
 import subprocess
+import requests
+import time
 
+root_dir = os.environ['HOME'] + '/IP-PUSH'
 
 def get_ipaddress_text(adapter):
     res = subprocess.check_output("/usr/sbin/ifconfig " + adapter + " | awk '{ print $2}' | "
@@ -12,21 +15,39 @@ def get_ipaddress_text(adapter):
                                   "tr -d '\n'", shell=True).decode('utf-8')
     return res
 
+def push_message(uri, message):
+    payload = '{"text":"' + message + '"}'
+    return requests.post(uri, data=payload)
+
 
 if __name__ == "__main__":
 
-    token = 'xoxb-729259314595-2423215791607-K4iHO1QloyB88jOEWg03tCC1'
-    client = WebClient(token)
+    if len(sys.argv) < 2:
+        print('Error: A txt file that contains slack uri must be given as an argument')
+        exit(1)
 
-    channel = '#ip-push'
-    ip_addr = get_ipaddress_text('eth0')
+    with open(sys.argv[1]) as f:
+        uri = f.readline()
 
-    text = f'NAS-PI\n - IP address: {ip_addr}'
+    prev_ip = '0.0.0.0'
 
-    response = client.chat_postMessage(text=text, channel=channel)
+    while(True):
 
-    log_fn = os.environ['HOME'] + '/ip_push.log'
-    time_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    with open(log_fn, 'a') as f:
-        f.write(time_str + '\n' + str(response) + '\n')
+        ip_addr = get_ipaddress_text('eth0')
+
+        if ip_addr != prev_ip:
+            prev_ip = ip_addr
+
+            # Push message to slack
+            text = f'NAS-PI\n - Local IP: {ip_addr}'
+            response = push_message(uri, text)
+
+            # Record log
+            log_fn = root_dir + '/ip_push.log'
+            time_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            with open(log_fn, 'a') as f:
+                f.write(time_str + '\n' + str(response) + '\n')
+
+
+        time.sleep(60 * 5)
 
