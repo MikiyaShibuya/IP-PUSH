@@ -27,19 +27,22 @@ if __name__ == "__main__":
         exit(1)
 
     with open(sys.argv[1]) as f:
-        uri = f.readline()
+        uri = f.readline().split('\n')[0]
+        device_name = f.readline().split('\n')[0]
 
     prev_ip = '0.0.0.0'
 
     while(True):
 
         ip_addr = get_ipaddress_text('eth0')
+        if ip_addr == '':
+            ip_addr = get_ipaddress_text('wlan0')
 
         if ip_addr != prev_ip:
             prev_ip = ip_addr
 
             # Push message to slack
-            text = f'NAS-PI\n - Local IP: {ip_addr}'
+            text = f'{device_name}\n - Local IP: {ip_addr}'
             response = push_message(uri, text)
 
             # Record log
