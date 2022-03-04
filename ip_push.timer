@@ -8,3 +8,4 @@ Unit=ip_push.service
 
 [Install]
 WantedBy=multi-user.target
+
