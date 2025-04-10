@@ -3,7 +3,7 @@ Description=Push IP Address to slack
 
 [Service]
 KillMode=process
-ExecStart=%h/IP-PUSH/ip_push.py %h/IP-PUSH/slack_uri.txt
+ExecStart=%h/lab/IP-PUSH/ip_push.py %h/lab/IP-PUSH/slack_uri.txt
 Type=simple
 Restart=always
 RestartSec=10

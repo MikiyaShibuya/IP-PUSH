@@ -9,7 +9,7 @@ import requests
 import time
 from typing import List
 
-root_dir = os.environ['HOME'] + '/IP-PUSH'
+root_dir = os.path.dirname(__file__)
 
 def get_ipaddress_text(adapter):
     res = subprocess.check_output("/usr/sbin/ifconfig " + adapter + " | awk '{ print $2}' | "
@@ -26,10 +26,7 @@ def find_address(text: str) -> List[str]:
     for cand in cands:
         try:
             last_num = int(cand.split('.')[-1])
-            print(cand)
-            print(last_num)
-            print()
-            if last_num != 0 and last_num != 1 and last_num != 255:
+            if last_num not in [0, 1, 255]:
                 ips.append(cand)
         except Exception as e:
             print(e)
